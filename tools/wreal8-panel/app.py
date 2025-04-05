@@ -13,6 +13,7 @@ WHITELIST = {
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key="A2n3S!2vD%C*yHAct3bgm@Urjt#7Gzk^1BES5@a4"
+app.config['SERVER_NAME'] = 'wreal8-panel.escarcela.xyz'
 app.permanent_session_lifetime = timedelta(minutes=5)
 
 # Configuración Stellar
