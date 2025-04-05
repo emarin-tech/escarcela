@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.env
+.env*
+*.DS_Store
+
+# PyCharm
+.idea/
+*.iml
+
+# Virtualenv
+venv/
+env/
+.venv/
+
+# Django
+staticfiles/
+media/
+db.sqlite3
+
+# Configuración local
+settings/local.py
+settings/__pycache__/
