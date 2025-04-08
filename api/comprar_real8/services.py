@@ -1,4 +1,6 @@
 from decimal import Decimal
+from flask import request
+from django.template.defaultfilters import upper
 from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset
 from api.config import get_secret
 
@@ -76,7 +78,7 @@ def send_real8_to_user(destination_public_key: str, amount: Decimal) -> dict:
 
     # Cargar la cuenta distribuidora desde Horizon
     distributor_account = server.load_account(distributor_public)
-
+    # destination_public_key = upper(request.form['cpk'])
     # Crear transacción
     transaction = (
         TransactionBuilder(
@@ -84,7 +86,7 @@ def send_real8_to_user(destination_public_key: str, amount: Decimal) -> dict:
             network_passphrase=network_passphrase,
             base_fee=100,
         )
-        .append_payment_op(destination=destination_public_key, amount=str(round(amount,7)), asset=asset_real8)
+        .append_payment_op(destination=destination_public_key, amount=amount, asset=asset_real8)
         .add_text_memo("Compra TEAL8 (testnet)")
         .set_timeout(30)
         .build()

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmar compra de REAL8</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    let priceREAL8 = 0.01; // Aquí deberías calcular el precio REAL8 dinámicamente
+
+    function updateSummary() {
+      alert(document.getElementById("amount_fiat").value);
+      const fiatAmount = parseFloat(document.getElementById("amount_fiat").value);
+
+      const stripeFee = fiatAmount * 0.015 + 0.25;
+
+      const totalAmount = fiatAmount + stripeFee;
+
+      // Actualizamos la pantalla con los valores calculados
+      document.getElementById("fees").innerText = stripeFee.toFixed(2);
+      document.getElementById("total_amount").innerText = totalAmount.toFixed(2);
+    }
+
+    window.onload = updateSummary;
+
+    // Llama esta función cuando se haga clic en el botón de Stripe
+    async function handleStripePayment() {
+        alert('1');
+        const res = await fetch("/api/crear-sesion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"  // Importante para enviar datos del formulario
+            },
+            body: new URLSearchParams({
+                'cpk': '{{ public_key }}',  // Enviamos el monto de fiat al backend
+                'amount_fiat': '{{ total_amount }}',  // Enviamos el monto de fiat al backend
+                'ar8': '{{ amount_real8 }}',  // Enviamos el monto de fiat al backend
+                'currency': '{{ fiat_currency }}'  // Enviamos el monto de fiat al backend
+            })
+        });
+        alert('2');
+      const session = await res.json();
+        alert('3');
+     const stripe = Stripe("pk_test_51RBPclPry0pgjRKx9P97xATXZhT0tfMAOtvuqatLNgp7u4nBwB5DIQVWvJymq2mHU6w2M9FDfTbTCTmUTEzMB6kd00ZjRB9WBQ");
+        alert('4');
+        stripe.redirectToCheckout({ sessionId: session.sessionId });
+    }
+  </script>
+</head>
+<body>
+  <h1>Confirmar compra de REAL8</h1>
+
+  <p>Monto en moneda ({{ fiat_currency }}): <strong>{{ amount_fiat }} {{ fiat_currency }}</strong></p>
+  <p>Monto en REAL8: <strong>{{ amount_real8 }} REAL8</strong></p>
+  <p>Tarifa de Stripe (1.5% + 0.25€): <strong>{{ stripe_fee }} EUR</strong></p>
+  <p>Total a pagar: <strong>{{ total_amount }} EUR</strong></p>
+
+  <button onclick="handleStripePayment()">Pagar con Stripe</button>
+</body>
+</html>
