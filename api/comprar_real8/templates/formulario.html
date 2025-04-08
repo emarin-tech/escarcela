@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Comprar REAL8</title>
+  <script>
+    let precioREAL8 = 0.01;
+
+    async function obtenerPrecio() {
+      const moneda = document.getElementById("fiat_currency").value;
+      const res = await fetch("/api/comprar-real8/precio?moneda=" + moneda);
+      const data = await res.json();
+      precioREAL8 = data.price * 1.05; // Aplicamos markup aquí
+      actualizarDesdeFiat();
+    }
+
+    function actualizarDesdeFiat() {
+      const fiat = parseFloat(document.getElementById("amount_fiat").value || 0);
+      if (document.getElementById("fiat_currency").value === "EUR") {
+          document.getElementById("amount_real8").value = Math.floor(fiat * 0.95 / 0.01);
+      } else {
+          document.getElementById("amount_real8").value = Math.floor(fiat * 0.95 / 0.011);
+      }
+    }
+
+    function actualizarDesdeReal8() {
+      const real8 = parseFloat(document.getElementById("amount_real8").value || 0);
+      if (document.getElementById("fiat_currency").value === "EUR") {
+          document.getElementById("amount_fiat").value = (real8 * .01 * 0.95).toFixed(2);
+      } else {
+          document.getElementById("amount_fiat").value = (real8 * 0.95 * 0.011).toFixed(2);
+      }
+    }
+
+    window.onload = () => {
+      obtenerPrecio();
+      document.getElementById("fiat_currency").addEventListener("change", obtenerPrecio);
+      document.getElementById("amount_fiat").addEventListener("input", actualizarDesdeFiat);
+      document.getElementById("amount_real8").addEventListener("input", actualizarDesdeReal8);
+    };
+  </script>
+</head>
+<body>
+  <h1>Compra de REAL8</h1>
+
+  <form action="/api/comprar-real8/resumen" method="POST">
+    <label>Clave pública Stellar:</label><br>
+    <input type="text" name="public_key" required><br>
+
+    <label>Moneda:</label><br>
+    <select name="fiat_currency" id="fiat_currency">
+      <option value="EUR">EUR</option>
+      <option value="USD">USD</option>
+    </select><br>
+
+    <label>Cantidad en moneda:</label><br>
+    <input type="number" id="amount_fiat" name="amount_fiat" step="0.01"><br>
+
+    <label>O cantidad de REAL8:</label><br>
+    <input type="number" id="amount_real8" name="amount_real8" step="1"><br><br>
+
+    <button type="submit">Continuar</button>
+  </form>
+</body>
+</html>
